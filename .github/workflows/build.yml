@@ -12,7 +12,7 @@ jobs:
 
     env:
       ZNUNY_IMAGE: ghcr.io/znuny/docker-znuny
-      ZNUNY_TAG: rel-6_2   # фиксируемся на версии Znuny 6.2
+      ZNUNY_TAG: latest   # фиксируемся на последней версии (Znuny 6.5 по состоянию на 10.10.2025)
 
     steps:
       # 1. Клонируем репозиторий
@@ -34,7 +34,7 @@ jobs:
           find Kernel -name '*.pm' -print0 | xargs -0 -n1 perl -c
 
       # 4. Собираем OPM-пакет внутри контейнера Znuny 6.2
-      - name: Build OPM package inside Znuny 6.2 container
+      - name: Build OPM package inside Znuny container
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/opt/znuny/custom" \
