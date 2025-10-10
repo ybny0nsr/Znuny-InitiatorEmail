@@ -26,7 +26,7 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/opt/znuny/custom \
-            ghcr.io/znuny/docker-znuny:rel-6_2 \
+            ghcr.io/znuny/docker-znuny:latest \
             bash -c "cd /opt/znuny && \
                      bin/otrs.Console.pl Dev::Package::Build \
                      /opt/znuny/custom/SOPM/Znuny-InitiatorEmail.sopm \
