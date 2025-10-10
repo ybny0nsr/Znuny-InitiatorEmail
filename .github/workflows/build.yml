@@ -21,7 +21,7 @@ jobs:
           echo "Checking Perl syntax..."
           find Kernel -name '*.pm' -print0 | xargs -0 -n1 perl -c
 
-      # 3. DEBUG: показать структуру контейнера
+      # 3. DEBUG: показать структуру контейнера и найти otrs.Console.pl
       - name: Debug container layout
         run: |
           docker run --rm mgcred/znuny:latest \
@@ -31,7 +31,7 @@ jobs:
                      echo '=== поиск otrs.Console.pl ==='; \
                      find /opt -name 'otrs.Console.pl' 2>/dev/null || true"
 
-      # 4. Собираем OPM-пакет внутри контейнера Znuny
+      # 4. Попытка сборки OPM-пакета (путь пока предполагаемый)
       - name: Build OPM package inside Znuny container
         run: |
           docker run --rm \
