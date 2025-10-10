@@ -21,7 +21,17 @@ jobs:
           echo "Checking Perl syntax..."
           find Kernel -name '*.pm' -print0 | xargs -0 -n1 perl -c
 
-      # 3. Собираем OPM-пакет внутри контейнера Znuny
+      # 3. DEBUG: показать структуру контейнера
+      - name: Debug container layout
+        run: |
+          docker run --rm mgcred/znuny:latest \
+            bash -c "echo '=== /opt ==='; ls -l /opt; \
+                     echo '=== /opt/znuny ==='; ls -l /opt/znuny || true; \
+                     echo '=== /opt/otrs ==='; ls -l /opt/otrs || true; \
+                     echo '=== поиск otrs.Console.pl ==='; \
+                     find /opt -name 'otrs.Console.pl' 2>/dev/null || true"
+
+      # 4. Собираем OPM-пакет внутри контейнера Znuny
       - name: Build OPM package inside Znuny container
         run: |
           docker run --rm \
@@ -32,14 +42,14 @@ jobs:
                      /opt/znuny/custom/SOPM/Znuny-InitiatorEmail.sopm \
                      --target-dir /opt/znuny/custom/build"
 
-      # 4. Загружаем собранный пакет как артефакт
+      # 5. Загружаем собранный пакет как артефакт
       - name: Upload OPM artifact
         uses: actions/upload-artifact@v4
         with:
           name: Znuny-InitiatorEmail-opm
           path: build/*.opm
 
-      # 5. Тестируем установку пакета
+      # 6. Тестируем установку пакета
       - name: Test OPM installation inside Znuny container
         run: |
           docker run --rm \
@@ -49,7 +59,7 @@ jobs:
                      bin/otrs.Console.pl Admin::Package::Install \
                      /opt/znuny/custom/build/*.opm"
 
-      # 6. Тестируем удаление пакета
+      # 7. Тестируем удаление пакета
       - name: Test OPM uninstallation inside Znuny container
         run: |
           docker run --rm \
