@@ -11,29 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ZNUNY_IMAGE: ghcr.io/znuny/docker-znuny
-      ZNUNY_TAG: rel-6_3   # фиксируемся на ближайшей доступной версии (Znuny 6.3 по состоянию на 10.10.2025)
+      ZNUNY_IMAGE: mgcred/znuny
+      ZNUNY_TAG: "6.5"   # используем рабочий тег с Docker Hub
 
     steps:
       # 1. Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Логинимся в GitHub Container Registry (ghcr.io)
-      - name: Authenticate to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # 3. Проверяем синтаксис Perl
+      # 2. Проверяем синтаксис Perl
       - name: Perl syntax check
         run: |
           echo "Checking Perl syntax..."
           find Kernel -name '*.pm' -print0 | xargs -0 -n1 perl -c
 
-      # 4. Собираем OPM-пакет внутри контейнера Znuny 6.2
+      # 3. Собираем OPM-пакет внутри контейнера Znuny
       - name: Build OPM package inside Znuny container
         run: |
           docker run --rm \
@@ -44,15 +36,15 @@ jobs:
                      /opt/znuny/custom/SOPM/Znuny-InitiatorEmail.sopm \
                      --target-dir /opt/znuny/custom/build"
 
-      # 5. Загружаем собранный пакет как артефакт
+      # 4. Загружаем собранный пакет как артефакт
       - name: Upload OPM artifact
         uses: actions/upload-artifact@v4
         with:
           name: Znuny-InitiatorEmail-opm
           path: build/*.opm
 
-      # 6. Тестируем установку пакета
-      - name: Test OPM installation inside Znuny 6.2 container
+      # 5. Тестируем установку пакета
+      - name: Test OPM installation inside Znuny container
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/build:/opt/znuny/custom/build" \
@@ -61,8 +53,8 @@ jobs:
                      bin/otrs.Console.pl Admin::Package::Install \
                      /opt/znuny/custom/build/*.opm"
 
-      # 7. Тестируем удаление пакета
-      - name: Test OPM uninstallation inside Znuny 6.2 container
+      # 6. Тестируем удаление пакета
+      - name: Test OPM uninstallation inside Znuny container
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/build:/opt/znuny/custom/build" \
