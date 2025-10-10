@@ -10,10 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      ZNUNY_IMAGE: mgcred/znuny
-      ZNUNY_TAG: "6.5-latest"   # рабочий тег с Docker Hub
-
     steps:
       # 1. Клонируем репозиторий
       - name: Checkout repository
@@ -30,7 +26,7 @@ jobs:
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/opt/znuny/custom" \
-            "${{ env.ZNUNY_IMAGE }}:${{ env.ZNUNY_TAG }}" \
+            mgcred/znuny:latest \
             bash -c "cd /opt/znuny && \
                      bin/otrs.Console.pl Dev::Package::Build \
                      /opt/znuny/custom/SOPM/Znuny-InitiatorEmail.sopm \
@@ -48,7 +44,7 @@ jobs:
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/build:/opt/znuny/custom/build" \
-            "${{ env.ZNUNY_IMAGE }}:${{ env.ZNUNY_TAG }}" \
+            mgcred/znuny:latest \
             bash -c "cd /opt/znuny && \
                      bin/otrs.Console.pl Admin::Package::Install \
                      /opt/znuny/custom/build/*.opm"
@@ -58,6 +54,6 @@ jobs:
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/build:/opt/znuny/custom/build" \
-            "${{ env.ZNUNY_IMAGE }}:${{ env.ZNUNY_TAG }}" \
+            mgcred/znuny:latest \
             bash -c "cd /opt/znuny && \
                      bin/otrs.Console.pl Admin::Package::Uninstall Znuny-InitiatorEmail"
