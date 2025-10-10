@@ -1,0 +1,15 @@
+# Perl
+*.pm~
+*.bak
+*.swp
+
+# Znuny/OTRS cache
+var/tmp/*
+var/log/*
+Kernel/Config/Files/XML/*.xml
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.iml
