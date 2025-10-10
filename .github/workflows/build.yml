@@ -34,7 +34,7 @@ jobs:
                      bin/otrs.Console.pl Dev::Package::Build \
                      /opt/znuny/custom/SOPM/Znuny-InitiatorEmail.sopm \
                      --target-dir /opt/znuny/custom/build"
-	
+
       # 4. Загружаем собранный OPM-пакет как артефакт
       - name: Upload OPM artifact
         uses: actions/upload-artifact@v4
