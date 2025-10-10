@@ -29,12 +29,12 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/opt/znuny/custom \
-            znuny/znuny:6.2 \
+            znuny/docker-znuny:6.2 \
             bash -c "cd /opt/znuny && \
                      bin/otrs.Console.pl Dev::Package::Build \
                      /opt/znuny/custom/SOPM/Znuny-InitiatorEmail.sopm \
                      --target-dir /opt/znuny/custom/build"
-
+	
       # 4. Загружаем собранный OPM-пакет как артефакт
       - name: Upload OPM artifact
         uses: actions/upload-artifact@v4
