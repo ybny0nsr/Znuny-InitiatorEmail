@@ -12,7 +12,7 @@ jobs:
 
     env:
       ZNUNY_IMAGE: ghcr.io/znuny/docker-znuny
-      ZNUNY_TAG: latest   # фиксируемся на последней версии (Znuny 6.5 по состоянию на 10.10.2025)
+      ZNUNY_TAG: rel-6_3   # фиксируемся на ближайшей доступной версии (Znuny 6.3 по состоянию на 10.10.2025)
 
     steps:
       # 1. Клонируем репозиторий
