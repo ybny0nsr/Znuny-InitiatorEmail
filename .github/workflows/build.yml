@@ -12,7 +12,7 @@ jobs:
 
     env:
       ZNUNY_IMAGE: mgcred/znuny
-      ZNUNY_TAG: "6.5"   # используем рабочий тег с Docker Hub
+      ZNUNY_TAG: "6.5-latest"   # рабочий тег с Docker Hub
 
     steps:
       # 1. Клонируем репозиторий
