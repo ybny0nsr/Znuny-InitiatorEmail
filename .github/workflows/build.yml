@@ -19,43 +19,46 @@ jobs:
           echo "Checking Perl syntax..."
           find Kernel -name '*.pm' -print0 | xargs -0 -n1 perl -c
 
-      # 🔎 Новый шаг: вывод версии Znuny
+      # Показать версию Znuny
       - name: Show Znuny version
         run: |
           docker run --rm mgcred/znuny:latest \
             bash -c "cd /opt/otrs && \
-                     bin/otrs.Console.pl Admin::Config::Dump \
-                     | grep FrameworkVersion"
+                     su -c 'bin/otrs.Console.pl Dev::Tools::Version' -s /bin/bash otrs"
 
+      # Сборка OPM-пакета
       - name: Build OPM package inside Znuny container
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/opt/otrs/custom" \
             mgcred/znuny:latest \
             bash -c "cd /opt/otrs && \
-                     bin/otrs.Console.pl Dev::Package::Build \
+                     su -c 'bin/otrs.Console.pl Dev::Package::Build \
                      /opt/otrs/custom/SOPM/Znuny-InitiatorEmail.sopm \
-                     --target-dir /opt/otrs/custom/build"
+                     --target-dir /opt/otrs/custom/build' -s /bin/bash otrs"
 
+      # Загрузка артефакта
       - name: Upload OPM artifact
         uses: actions/upload-artifact@v4
         with:
           name: Znuny-InitiatorEmail-opm
           path: build/*.opm
 
+      # Тест установки пакета
       - name: Test OPM installation inside Znuny container
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/build:/opt/otrs/custom/build" \
             mgcred/znuny:latest \
             bash -c "cd /opt/otrs && \
-                     bin/otrs.Console.pl Admin::Package::Install \
-                     /opt/otrs/custom/build/*.opm"
+                     su -c 'bin/otrs.Console.pl Admin::Package::Install \
+                     /opt/otrs/custom/build/*.opm' -s /bin/bash otrs"
 
+      # Тест удаления пакета
       - name: Test OPM uninstallation inside Znuny container
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/build:/opt/otrs/custom/build" \
             mgcred/znuny:latest \
             bash -c "cd /opt/otrs && \
-                     bin/otrs.Console.pl Admin::Package::Uninstall Znuny-InitiatorEmail"
+                     su -c 'bin/otrs.Console.pl Admin::Package::Uninstall Znuny-InitiatorEmail' -s /bin/bash otrs"
