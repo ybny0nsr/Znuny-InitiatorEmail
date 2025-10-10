@@ -23,3 +23,28 @@
 1. Соберите пакет `.opm` из `.sopm` файла:
    ```bash
    bin/otrs.Console.pl Dev::Package::Build SOPM/Znuny-InitiatorEmail.sopm
+2. Установите пакет через Znuny Package Manager.
+3. Настройте SysConfig:
+- PostMaster::PreFilterModule###InitiatorEmail → Kernel::System::PostMaster::Filter::InitiatorEmail
+- PostMaster::PreFilterModule###InitiatorEmail::Senders → список адресов (через запятую)
+- PostMaster::PreFilterModule###InitiatorEmail::Regex → регулярное выражение для поиска email
+- PostMaster::PreFilterModule###InitiatorEmail::DynamicField → имя динамического поля (например - InitiatorEmail)
+
+## Конфигурация
+Динамическое поле: создайте поле InitiatorEmail типа Text в разделе Ticket.
+
+SysConfig: укажите список отправителей и регулярное выражение для извлечения email.
+
+Regex по умолчанию: ^Email:\s*([A-Za-z0-9._%+-]+\@[A-Za-z0-9.-]+\.[A-Za-z]{2,})
+
+
+## CI/CD
+В репозитории настроен GitHub Actions workflow .github/workflows/build.yml, который выполняет:
+
+- Проверку синтаксиса Perl (perl -c для всех .pm файлов).
+- Сборку .opm пакета внутри контейнера znuny/znuny:6.2.
+- Загрузку артефакта — готовый .opm доступен в разделе Actions → Artifacts.
+- Тест установки пакета в чистом контейнере Znuny 6.2.
+- Тест удаления пакета для проверки корректной деинсталляции.
+
+Таким образом, каждый пуш в ветку main автоматически проверяется и таким образом повышается вероятность, что пакет можно собрать, установить и удалить без ошибок.
