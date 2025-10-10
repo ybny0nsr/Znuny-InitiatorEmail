@@ -19,14 +19,15 @@ jobs:
           echo "Checking Perl syntax..."
           find Kernel -name '*.pm' -print0 | xargs -0 -n1 perl -c
 
-      # 🔎 Показать версию Znuny
       - name: Show Znuny version
         run: |
           docker run --rm mgcred/znuny:latest \
             bash -c "cd /opt/otrs && \
                      su -c 'bin/otrs.Console.pl | head -n 1' -s /bin/bash otrs"
 
-      # 🛠 Сборка OPM-пакета (исправленный синтаксис)
+      - name: Prepare build directory
+        run: mkdir -p build
+
       - name: Build OPM package inside Znuny container
         run: |
           docker run --rm \
@@ -37,14 +38,16 @@ jobs:
                      /opt/otrs/custom/SOPM/Znuny-InitiatorEmail.sopm \
                      /opt/otrs/custom/build' -s /bin/bash otrs"
 
-      # 📦 Загрузка артефакта
+      # 🔎 Новый шаг: показать содержимое build/
+      - name: List build directory
+        run: ls -l build
+
       - name: Upload OPM artifact
         uses: actions/upload-artifact@v4
         with:
           name: Znuny-InitiatorEmail-opm
           path: build/*.opm
 
-      # ✅ Тест установки пакета
       - name: Test OPM installation inside Znuny container
         run: |
           docker run --rm \
@@ -54,7 +57,6 @@ jobs:
                      su -c 'bin/otrs.Console.pl Admin::Package::Install \
                      /opt/otrs/custom/build/*.opm' -s /bin/bash otrs"
 
-      # ❌ Тест удаления пакета
       - name: Test OPM uninstallation inside Znuny container
         run: |
           docker run --rm \
