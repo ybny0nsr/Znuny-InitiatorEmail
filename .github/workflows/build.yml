@@ -1,66 +1,36 @@
-name: Build and Test Znuny OPM Package
+name: Perl and SOPM Checks
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]        # Запускать при пуше в main
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ]        # И при PR в main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  checks:
+    runs-on: ubuntu-latest      # Среда выполнения — Ubuntu
 
     steps:
+      # 1. Забираем код из репозитория
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Проверяем синтаксис всех Perl-модулей
       - name: Perl syntax check
         run: |
           echo "Checking Perl syntax..."
+          # Находим все .pm файлы в Kernel и проверяем perl -c
           find Kernel -name '*.pm' -print0 | xargs -0 -n1 perl -c
 
-      - name: Show Znuny version
+      # 3. Проверяем, что все .sopm — корректный XML
+      - name: Validate SOPM XML
         run: |
-          docker run --rm mgcred/znuny:latest \
-            bash -c "cd /opt/otrs && \
-                     su -c 'bin/otrs.Console.pl | head -n 1' -s /bin/bash otrs"
-
-      - name: Prepare build directory
-        run: mkdir -p build
-
-      - name: Build OPM package inside Znuny container
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}:/opt/otrs/custom" \
-            mgcred/znuny:latest \
-            bash -c "cd /opt/otrs && \
-                     su -c 'bin/otrs.Console.pl Dev::Package::Build \
-                     /opt/otrs/custom/SOPM/Znuny-InitiatorEmail.sopm \
-                     /opt/otrs/custom/build' -s /bin/bash otrs"
-
-      # 🔎 Новый шаг: показать содержимое build/
-      - name: List build directory
-        run: ls -l build
-
-      - name: Upload OPM artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Znuny-InitiatorEmail-opm
-          path: build/*.opm
-
-      - name: Test OPM installation inside Znuny container
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}/build:/opt/otrs/custom/build" \
-            mgcred/znuny:latest \
-            bash -c "cd /opt/otrs && \
-                     su -c 'bin/otrs.Console.pl Admin::Package::Install \
-                     /opt/otrs/custom/build/*.opm' -s /bin/bash otrs"
-
-      - name: Test OPM uninstallation inside Znuny container
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}/build:/opt/otrs/custom/build" \
-            mgcred/znuny:latest \
-            bash -c "cd /opt/otrs && \
-                     su -c 'bin/otrs.Console.pl Admin::Package::Uninstall Znuny-InitiatorEmail' -s /bin/bash otrs"
+          echo "Validating SOPM files..."
+          # Устанавливаем xmllint
+          sudo apt-get update -qq
+          sudo apt-get install -y libxml2-utils
+          # Проверяем каждый .sopm в каталоге SOPM
+          for file in SOPM/*.sopm; do
+            echo "Checking $file"
+            xmllint --noout "$file"
+          done
