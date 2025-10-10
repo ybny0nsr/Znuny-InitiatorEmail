@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_package version="1.0">
+    <Name>Znuny-InitiatorEmail</Name>
+    <Version>0.1.0</Version>
+    <Framework>6.2.x</Framework>
+    <Vendor>Oleg</Vendor>
+    <URL>https://github.com/youraccount/Znuny-InitiatorEmail</URL>
+    <License>GPL-3.0</License>
+    <Description>
+        <en>Extracts initiator email from incoming messages and stores it in a dynamic field.</en>
+        <ru>Извлекает email инициатора из входящих сообщений и сохраняет в динамическое поле.</ru>
+    </Description>
+
+    <Filelist>
+        <File Location="Kernel/System/PostMaster/Filter/InitiatorEmail.pm" Permission="644"/>
+    </Filelist>
+
+    <ConfigItem Name="PostMaster::PreFilterModule###InitiatorEmail" Required="1" Valid="1">
+        <Description Translatable="1">Enable InitiatorEmail filter</Description>
+        <Group>PostMaster</Group>
+        <SubGroup>Filter</SubGroup>
+        <Setting>
+            <String>Kernel::System::PostMaster::Filter::InitiatorEmail</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="PostMaster::PreFilterModule###InitiatorEmail::Senders" Required="0" Valid="1">
+        <Description Translatable="1">Comma-separated list of senders</Description>
+        <Group>PostMaster</Group>
+        <SubGroup>Filter</SubGroup>
+        <Setting>
+            <String>oleg.tikhonoff@gmail.com</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="PostMaster::PreFilterModule###InitiatorEmail::Regex" Required="0" Valid="1">
+        <Description Translatable="1">Regex to extract email</Description>
+        <Group>PostMaster</Group>
+        <SubGroup>Filter</SubGroup>
+        <Setting>
+            <String>^Email:\s*([A-Za-z0-9._%+-]+\@[A-Za-z0-9.-]+\.[A-Za-z]{2,})</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="PostMaster::PreFilterModule###InitiatorEmail::DynamicField" Required="0" Valid="1">
+        <Description Translatable="1">Dynamic field name</Description>
+        <Group>PostMaster</Group>
+        <SubGroup>Filter</SubGroup>
+        <Setting>
+            <String>InitiatorEmail</String>
+        </Setting>
+    </ConfigItem>
+</otrs_package>
